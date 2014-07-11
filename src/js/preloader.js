@@ -20,6 +20,7 @@
 			this.load.image('background', 'assets/background.png');
 			this.load.image('block-top', 'assets/block-top.png');
 			this.load.image('block-bottom', 'assets/block-bottom.png');
+			this.load.image('start', 'assets/start.png');
 
 			this.load.bitmapFont('gamefont', 'assets/Arial.png', 'assets/Arial.xml');
 		},

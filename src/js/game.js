@@ -78,8 +78,8 @@
 			this.scoreText.scale.setTo(4, 4);
 			this.world.add(this.scoreText);
 
-			// Setup KeyBoard
-			this.jumpButton = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+			// Setup Touch
+			this.game.input.onDown.add(this.flap, this);
 		},
 
 		update: function () {
@@ -91,14 +91,18 @@
 		},
 
 		updateBird: function () {
-			if (this.jumpButton.isDown || this.game.didFlap) {
-				this.bird.body.velocity.y = -300;
-				this.game.didFlap = false;
+			if (this.game.didFlap) {
+				this.flap();
 			}
 			this.bird.rotation = this.bird.body.velocity.y / 480.0;
 			if (this.bird.y > 875) {
 				this.gameOver();
 			}
+		},
+
+		flap: function () {
+			this.bird.body.velocity.y = -300;
+			this.game.didFlap = false;
 		},
 
 		updateBlocks: function () {

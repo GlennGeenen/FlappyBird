@@ -27,12 +27,15 @@
 			this.titleTxt.x = x - this.titleTxt.textWidth;
 			this.world.add(this.titleTxt);
 
-			this.startTxt = this.add.bitmapText(x, y - 220, 'gamefont', 'PRESS ENTER TO START\nPRESS SPACE TO FLAP');
+			this.startTxt = this.add.bitmapText(x, y - 245, 'gamefont', 'CLICK/TAP TO FLAP');
 			this.startTxt.align = 'center';
 			this.startTxt.x = x - this.startTxt.textWidth * 0.5;
 			this.world.add(this.startTxt);
 
-			var shape = this.add.graphics(x - 125, y - 110);
+			var button = this.add.button(x - 125, y + 125, 'start', this.actionOnClick, this, 2, 1, 0);
+			this.world.add(button);
+
+			var shape = this.add.graphics(x - 125, y - 200);
 			shape.lineStyle(5, 0xFFFFFF, 1);
 			shape.beginFill(0xddd894, 1);
 			shape.drawRect(0, 0, 250, 250);
@@ -54,33 +57,31 @@
 			var x = 1920 * 0.5;
 			var y = 1080 * 0.5;
 
-			var text = this.add.bitmapText(x, y - 75, 'gamefont', 'Your Score');
+			var text = this.add.bitmapText(x, y - 165, 'gamefont', 'Your Score');
 			text.align = 'center';
 			text.x = x - text.textWidth * 0.5;
 			this.world.add(text);
 
-			text = this.add.bitmapText(x, y - 40, 'gamefont', '' + this.score);
+			text = this.add.bitmapText(x, y - 130, 'gamefont', '' + this.score);
 			text.align = 'center';
 			text.scale.setTo(2, 2);
 			text.x = x - text.textWidth;
 			this.world.add(text);
 
-			text = this.add.bitmapText(x, y + 25, 'gamefont', 'High Score');
+			text = this.add.bitmapText(x, y - 65, 'gamefont', 'High Score');
 			text.align = 'center';
 			text.x = x - text.textWidth * 0.5;
 			this.world.add(text);
 
-			text = this.add.bitmapText(x, y + 60, 'gamefont', '' + highScore);
+			text = this.add.bitmapText(x, y - 30, 'gamefont', '' + highScore);
 			text.align = 'center';
 			text.scale.setTo(2, 2);
 			text.x = x - text.textWidth;
 			this.world.add(text);
 		},
 
-		update: function () {
-			if (this.game.input.keyboard.isDown(Phaser.Keyboard.ENTER)) {
-				this.game.state.start('game');
-			}
+		actionOnClick: function () {
+			this.game.state.start('game');
 		}
 	};
 
