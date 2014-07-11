@@ -1,8 +1,11 @@
 window.onload = function () {
 	'use strict';
 
-	var w = window.innerWidth * window.devicePixelRatio;
-	var h = window.innerHeight * window.devicePixelRatio;
+	//	var w = window.innerWidth * window.devicePixelRatio;
+	//	var h = window.innerHeight * window.devicePixelRatio;
+
+	var w = window.innerWidth;
+	var h = window.innerHeight;
 
 	var gameWidth = (h > w) ? h : w;
 	var gameHeight = (h > w) ? w : h;
@@ -16,8 +19,6 @@ window.onload = function () {
 		gameHeight = gameWidth / (1920 / 1080);
 		scale = gameWidth / 1920;
 	}
-
-	console.log('scale: ' + scale);
 
 	var ns = window['flappybird'];
 	var game = new Phaser.Game(gameWidth, gameHeight, Phaser.AUTO, 'flappybird');
