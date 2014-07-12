@@ -47,12 +47,16 @@
 			this.bird.body.velocity.x = 0;
 			this.bird.body.collideWorldBounds = true;
 
+			// Scale bird bounding box
+			this.bird.body.width = this.bird.width * this.game.gameScale;
+			this.bird.body.height = this.bird.height * this.game.gameScale;
+
 			// Setup Blocks	
 			this.blockGroup = this.game.add.group();
 			this.blockGroup.enableBody = true;
+			this.blockGroup.physicsBodyType = Phaser.Physics.ARCADE;
 
 			for (var i = 0; i < this.numberOfBlocks; ++i) {
-
 				var x = 1920 + (i * this.blockSpacing);
 				var y = this.getNewYPosition();
 
@@ -62,13 +66,15 @@
 				var topBlock = this.blockGroup.create(x, y, 'block-top');
 				topBlock.anchor.setTo(0.5, 1);
 				topBlock.body.immovable = true;
-				topBlock.body.updateBounds(1, 1);
+				topBlock.body.width = topBlock.width * this.game.gameScale;
 
 				var bottomBlock = this.blockGroup.create(x, y + this.verticalSpacing, 'block-bottom');
 				bottomBlock.anchor.setTo(0.5, 0);
 				bottomBlock.body.immovable = true;
+				bottomBlock.body.width = bottomBlock.width * this.game.gameScale;
 			}
-			this.game.physics.enable(this.blockGroup, Phaser.Physics.ARCADE);
+
+			// Set the movespeed for the blocks
 			this.blockGroup.setAll('body.velocity.x', -200);
 			this.world.add(this.blockGroup);
 
@@ -111,7 +117,7 @@
 			var scored = false;
 			this.blockGroup.forEach(function (block) {
 
-				//Check If Scored
+				// Check If Scored
 				if (!block.scored && block.x + block.width * 0.5 < this.bird.x - this.bird.width * 0.5) {
 					scored = true;
 					block.scored = true;
