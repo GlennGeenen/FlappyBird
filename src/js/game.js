@@ -1,175 +1,174 @@
 (function () {
-	'use strict';
+    'use strict';
 
-	function Game() {
-		this.bird = null;
-		this.jumpButton = null;
-		this.world = null;
+    function Game() {
+        this.bird = null;
+        this.jumpButton = null;
+        this.blockGroup = null;
+        this.scoreText = null;
+    }
 
-		this.numberOfBlocks = 5;
-		this.blockGroup = null;
+    Game.prototype = {
 
-		this.score = 0;
-		this.scoreText = null;
+        create: function () {
 
-		// How far blocks are apart of each other horizontally
-		this.blockSpacing = 600;
-		// How far blocks are apart of each other vertically
-		this.verticalSpacing = 270;
-		// X Position of the last block so we know where to add the next
-		this.lastBlock = 0;
-		// Y Position of the last block and starting position of bird
-		this.lastY = 300;
-	}
+            // Set Background
+            this.add.sprite(0, 0, 'background');
 
-	Game.prototype = {
+            // Start Physics
+            this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
-		create: function () {
+            // Setup game variables
+            this.setupVariables();
 
-			// Put everything in world group that we scale
-			this.world = this.game.add.group();
-			this.world.scale.setTo(this.game.gameScale * 10 / 10, this.game.gameScale * 10 / 10);
+            // Setup Bird
+            this.createBird();
 
-			// Set Background
-			this.world.create(0, 0, 'background');
+            // Setup Blocks	
+            this.createBlocks();
 
-			// Setup Bird
-			this.bird = this.world.create(400, this.lastY, 'bird');
-			this.bird.anchor.setTo(0.5, 0.5);
-			this.bird.animations.add('fly');
-			this.bird.animations.play('fly', 10, true);
+            // Setup Score Text
+            this.scoreText = this.add.bitmapText(40, 20, 'gamefont', '' + this.score);
+            this.scoreText.scale.setTo(4, 4);
 
-			// Setup Gravity
-			this.game.physics.startSystem(Phaser.Physics.ARCADE);
-			this.game.physics.enable(this.bird, Phaser.Physics.ARCADE);
-			this.bird.body.bounce.y = 0.1;
-			this.bird.body.gravity.y = 500;
-			this.bird.body.velocity.x = 0;
-			this.bird.body.collideWorldBounds = true;
+            // Setup Touch
+            this.game.input.onDown.add(this.flap, this);
+        },
 
-			// Scale bird bounding box
-			this.bird.body.width = this.bird.width * this.game.gameScale;
-			this.bird.body.height = this.bird.height * this.game.gameScale;
+        setupVariables: function () {
+            // Always start with score 0
+            this.score = 0;
+            // The number of block pairs
+            this.numberOfBlocks = 5;
+            // How far blocks are apart of each other horizontally
+            this.blockSpacing = 600;
+            // How far blocks are apart of each other vertically
+            this.verticalSpacing = 270;
+            // X Position of the last block so we know where to add the next
+            this.lastBlock = 0;
+            // Y Position of the last block and starting position of bird
+            this.lastY = 300;
+        },
 
-			// Setup Blocks	
-			this.blockGroup = this.game.add.group();
-			this.blockGroup.enableBody = true;
-			this.blockGroup.physicsBodyType = Phaser.Physics.ARCADE;
+        createBird: function () {
+            this.bird = this.add.sprite(400, this.lastY, 'bird');
+            this.bird.anchor.set(0.5);
+            this.bird.animations.add('fly');
+            this.bird.animations.play('fly', 10, true);
+            this.physics.arcade.enable(this.bird);
+            this.bird.body.bounce.y = 0.1;
+            this.bird.body.gravity.y = 500;
+            this.bird.body.velocity.x = 0;
+            this.bird.body.collideWorldBounds = true;
+        },
 
-			for (var i = 0; i < this.numberOfBlocks; ++i) {
-				var x = 1920 + (i * this.blockSpacing);
-				var y = this.getNewYPosition();
+        createBlocks: function () {
+            this.blockGroup = this.add.group();
+            this.blockGroup.enableBody = true;
+            this.blockGroup.physicsBodyType = Phaser.Physics.ARCADE;
 
-				this.lastY = y;
-				this.lastBlock = x;
+            for (var i = 0; i < this.numberOfBlocks; ++i) {
+                var x = this.game.width + (i * this.blockSpacing);
+                var y = this.getNewYPosition();
 
-				var topBlock = this.blockGroup.create(x, y, 'block-top');
-				topBlock.anchor.setTo(0.5, 1);
-				topBlock.body.immovable = true;
-				topBlock.body.width = topBlock.width * this.game.gameScale;
+                this.lastY = y;
+                this.lastBlock = x;
 
-				var bottomBlock = this.blockGroup.create(x, y + this.verticalSpacing, 'block-bottom');
-				bottomBlock.anchor.setTo(0.5, 0);
-				bottomBlock.body.immovable = true;
-				bottomBlock.body.width = bottomBlock.width * this.game.gameScale;
-			}
+                // We always create a top and a bottom block
+                var topBlock = this.blockGroup.create(x, y, 'block-top');
+                topBlock.anchor.setTo(0.5, 1);
+                topBlock.body.immovable = true;
 
-			// Set the movespeed for the blocks
-			this.blockGroup.setAll('body.velocity.x', -200);
-			this.world.add(this.blockGroup);
+                var bottomBlock = this.blockGroup.create(x, y + this.verticalSpacing, 'block-bottom');
+                bottomBlock.anchor.setTo(0.5, 0);
+                bottomBlock.body.immovable = true;
+            }
 
-			// Setup Score
-			this.score = 0;
-			this.scoreText = this.add.bitmapText(40, 20, 'gamefont', '' + this.score);
-			this.scoreText.scale.setTo(4, 4);
-			this.world.add(this.scoreText);
+            this.blockGroup.setAll('body.velocity.x', -200);
+        },
 
-			// Setup Touch
-			this.game.input.onDown.add(this.flap, this);
-		},
+        update: function () {
 
-		update: function () {
+            this.physics.arcade.collide(this.bird, this.blockGroup, this.gameOver, null, this);
 
-			this.physics.arcade.collide(this.bird, this.blockGroup, this.gameOver, null, this);
+            this.updateBird();
+            this.updateBlocks();
+        },
 
-			this.updateBird();
-			this.updateBlocks();
-		},
+        updateBird: function () {
+            if (this.game.didFlap) {
+                this.flap();
+            }
+            this.bird.rotation = this.bird.body.velocity.y / 480.0;
+            if (this.bird.y > 875) {
+                this.gameOver();
+            }
+        },
 
-		updateBird: function () {
-			if (this.game.didFlap) {
-				this.flap();
-			}
-			this.bird.rotation = this.bird.body.velocity.y / 480.0;
-			if (this.bird.y > 875) {
-				this.gameOver();
-			}
-		},
+        flap: function () {
+            // Setting velocity.y makes you go up
+            this.bird.body.velocity.y = -350;
+            this.game.didFlap = false;
+        },
 
-		flap: function () {
-			this.bird.body.velocity.y = -300;
-			this.game.didFlap = false;
-		},
+        updateBlocks: function () {
+            var lastX = 0;
+            var newY = 0;
+            var scored = false;
+            this.blockGroup.forEach(function (block) {
 
-		updateBlocks: function () {
-			var lastX = 0;
-			var newY = 0;
-			var scored = false;
-			this.blockGroup.forEach(function (block) {
+                // Check If Scored
+                if (!block.scored && block.x + block.width * 0.5 < this.bird.x - this.bird.width * 0.5) {
+                    scored = true;
+                    block.scored = true;
+                }
 
-				// Check If Scored
-				if (!block.scored && block.x + block.width * 0.5 < this.bird.x - this.bird.width * 0.5) {
-					scored = true;
-					block.scored = true;
-				}
+                if (block.x > lastX) {
+                    lastX = block.x;
+                } else if (block.x < -200) {
+                    if (newY === 0) {
+                        newY = this.getNewYPosition();
+                    }
+                    block.x = this.lastBlock + this.blockSpacing;
+                    if (block.anchor.y === 1) {
+                        block.y = newY;
+                    } else {
+                        block.y = newY + this.verticalSpacing;
+                    }
+                    block.scored = false;
+                }
+            }, this);
 
-				if (block.x > lastX) {
-					lastX = block.x;
-				} else if (block.x < -200) {
+            if (newY !== 0) {
+                this.lastY = newY;
+            }
+            this.lastBlock = lastX;
 
-					if (newY === 0) {
-						newY = this.getNewYPosition();
-					}
+            // You always have a top and a bottom block scoring, but you only want to score one.
+            if (scored) {
+                ++this.score;
+                this.scoreText.setText('' + this.score);
+            }
+        },
 
-					block.x = this.lastBlock + this.blockSpacing;
-					if (block.anchor.y === 1) {
-						block.y = newY;
-					} else {
-						block.y = newY + this.verticalSpacing;
-					}
-					block.scored = false;
-				}
-			}, this);
+        // Calculate Y Position for the next block
+        // Edit this method to change the difficulty of the game
+        getNewYPosition: function () {
+            var y = 0;
+            do {
+                y = 200 + Math.random() * 400;
+            }
+            while (this.lastY - y > 200 || this.lastY - y < -200);
+            return y;
+        },
 
-			if (newY !== 0) {
-				this.lastY = newY;
-			}
-			this.lastBlock = lastX;
+        gameOver: function () {
+            this.game.state.states['menu'].score = this.score;
+            this.game.state.start('menu');
+        }
+    };
 
-			if (scored) {
-				++this.score;
-				this.scoreText.setText('' + this.score);
-			}
-		},
-
-		// Calculate Y Position for the next block
-		// Edit this method to change the difficulty of the game
-		getNewYPosition: function () {
-			var y = 0;
-			do {
-				y = 200 + Math.random() * 400;
-			}
-			while (this.lastY - y > 200 || this.lastY - y < -200);
-			return y;
-		},
-
-		gameOver: function () {
-			this.game.state.states['menu'].score = this.score;
-			this.game.state.start('menu');
-		}
-	};
-
-	window['flappybird'] = window['flappybird'] || {};
-	window['flappybird'].Game = Game;
+    window['flappybird'] = window['flappybird'] || {};
+    window['flappybird'].Game = Game;
 
 }());

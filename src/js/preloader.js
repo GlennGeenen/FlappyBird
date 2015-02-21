@@ -1,46 +1,49 @@
 (function () {
-	'use strict';
+    'use strict';
 
-	function Preloader() {
-		this.asset = null;
-		this.ready = false;
-	}
+    function Preloader() {
+        this.asset = null;
+        this.ready = false;
+    }
 
-	Preloader.prototype = {
+    Preloader.prototype = {
 
-		preload: function () {
-			this.asset = this.add.sprite(this.game.width, this.game.height, 'preloader');
-			this.asset.anchor.setTo(0.5, 0.5);
+        preload: function () {
+            this.asset = this.add.sprite(this.game.width * 0.5 - 110, this.game.height * 0.5 - 10, 'preloader');
 
-			this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
-			this.load.setPreloadSprite(this.asset);
+            this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
+            this.load.setPreloadSprite(this.asset);
 
-			this.load.spritesheet('bird', 'assets/bird.png', 100, 69, 2);
+            this.loadResources();
+        },
 
-			this.load.image('background', 'assets/background.png');
-			this.load.image('block-top', 'assets/block-top.png');
-			this.load.image('block-bottom', 'assets/block-bottom.png');
-			this.load.image('start', 'assets/start.png');
+        loadResources: function () {
+            this.load.spritesheet('bird', 'assets/bird.png', 100, 69, 2);
 
-			this.load.bitmapFont('gamefont', 'assets/Arial.png', 'assets/Arial.xml');
-		},
+            this.load.image('background', 'assets/background.png');
+            this.load.image('block-top', 'assets/block-top.png');
+            this.load.image('block-bottom', 'assets/block-bottom.png');
+            this.load.image('start', 'assets/start.png');
 
-		create: function () {
-			this.asset.cropEnabled = false;
-		},
+            this.load.bitmapFont('gamefont', 'assets/Arial.png', 'assets/Arial.xml');
+        },
 
-		update: function () {
-			if (!!this.ready) {
-				this.game.state.start('menu');
-			}
-		},
+        create: function () {
+            this.asset.cropEnabled = false;
+        },
 
-		onLoadComplete: function () {
-			this.ready = true;
-		}
-	};
+        update: function () {
+            if (!!this.ready) {
+                this.game.state.start('menu');
+            }
+        },
 
-	window['flappybird'] = window['flappybird'] || {};
-	window['flappybird'].Preloader = Preloader;
+        onLoadComplete: function () {
+            this.ready = true;
+        }
+    };
+
+    window['flappybird'] = window['flappybird'] || {};
+    window['flappybird'].Preloader = Preloader;
 
 }());
