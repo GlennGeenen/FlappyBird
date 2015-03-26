@@ -18,7 +18,8 @@
         },
 
         loadResources: function () {
-            this.load.spritesheet('bird', 'assets/bird.png', 100, 69, 2);
+            this.load.spritesheet('bird0', 'assets/bird0.png', 100, 69, 2);
+            this.load.spritesheet('bird1', 'assets/bird1.png', 100, 69, 2);
 
             this.load.image('background', 'assets/background.png');
             this.load.image('block-top', 'assets/block-top.png');

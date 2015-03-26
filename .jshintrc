@@ -19,6 +19,7 @@
   "sub": true,
   "debug": true,
   "globals": {
-    "Phaser": false
+    "Phaser": false,
+    "_": false
   }
 }
