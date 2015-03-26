@@ -159,7 +159,7 @@
                     lastX = block.x;
                 }
                 // Check collision with birds
-                else if (block.x < 500 && block.x > 400) {
+                else if (block.x < 500 && block.x > 300) {
                   
                   if(Math.abs(block.x - birdx) < birdw) {
                     
