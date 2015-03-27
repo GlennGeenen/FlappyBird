@@ -14,9 +14,6 @@
             // Set Background
             this.add.sprite(0, 0, 'background');
 
-            // Start Physics
-            //this.game.physics.startSystem(Phaser.Physics.ARCADE);
-
             // Setup game variables
             this.setupVariables();
           
@@ -25,6 +22,17 @@
 
             // Setup Players
             this.createPlayers();
+            
+            var guide = this.add.sprite(this.game.width * 0.5, this.game.height, 'flap');
+            guide.anchor.setTo(0.5,1);
+            var _this = this;
+            setTimeout(function() {
+                var tw = _this.add.tween(guide);
+                tw.to( { alpha: 0 }, 1000, Phaser.Easing.Linear.None, true);
+                tw.onComplete.add(function() {
+                    guide.destroy();
+                });
+            }, 5000);
 
             // Setup Score Text
             this.scoreText = this.add.bitmapText(40, 20, 'gamefont', '' + this.score);
@@ -39,7 +47,7 @@
             // How far blocks are apart of each other horizontally
             this.blockSpacing = 600;
             // How far blocks are apart of each other vertically
-            this.verticalSpacing = 270;
+            this.verticalSpacing = 350;
             // X Position of the last block so we know where to add the next
             this.lastBlock = 0;
             // Y Position of the last block and starting position of bird
@@ -117,7 +125,7 @@
             bird = this.players[i].bird;
             if(bird.alive) {
               
-              bird.g += deltaTime * 5;
+              bird.g += deltaTime * 4;
               
               bird.y += bird.g;
               
@@ -142,14 +150,13 @@
             var scored = false;
           
             var birdx = this.players[0].bird.x;
-            var birdw = this.players[0].bird.width;
           
             this.blockGroup.forEach(function (block) {
               
                 block.x -= dt * 100;
 
                 // Check If Scored
-                if (!block.scored && block.x + block.width * 0.5 < birdx - birdw * 0.5) {
+                if (!block.scored && block.x + block.width * 0.5 < birdx - 50) {
                     scored = true;
                     block.scored = true;
                 }
@@ -159,10 +166,7 @@
                     lastX = block.x;
                 }
                 // Check collision with birds
-                else if (block.x < 500 && block.x > 300) {
-                  
-                  if(Math.abs(block.x - birdx) < birdw) {
-                    
+                else if(Math.abs(block.x - birdx) < 100) {
                     for(var i = 0; i < this.game.maxPlayers; ++i) {
                       if ((block.anchor.y === 1 && block.y > this.players[i].bird.y - 30) ||
                          (block.anchor.y === 0 && block.y < this.players[i].bird.y + 30)) {
@@ -171,7 +175,6 @@
                     }
                     
                   }
-                }
                 // Reset block to the right
                 else if(block.x < -200) {
                     if (newY === 0) {
@@ -196,6 +199,13 @@
             if (scored) {
                 ++this.score;
                 this.scoreText.setText('' + this.score);
+                
+                if(this.score > 20) {
+                    this.verticalSpacing = 325;
+                } else if(this.score > 10) {
+                    this.verticalSpacing = 300;
+                }
+                
             }
         },
 
@@ -204,7 +214,7 @@
         getNewYPosition: function () {
             var y = 0;
             do {
-                y = 200 + Math.random() * 400;
+                y = 150 + Math.random() * 400;
             }
             while (this.lastY - y > 200 || this.lastY - y < -200);
             return y;
@@ -265,8 +275,6 @@
               continue;
             }
             joints = joints.Joints;
-            
-            // console.log(i + ': ' + this.players[i].flaptry + ' ' + this.players[i].flapStatus);
 
             ++this.players[i].flaptry;
             if(this.players[i].flaptry > 15) {
@@ -301,7 +309,7 @@
                     continue;
                 }
 
-                this.players[i].bird.g = -8;
+                this.players[i].bird.g = -7;
                 this.players[i].flapStatus = 0;
                 this.players[i].flaptry = 0;
             }

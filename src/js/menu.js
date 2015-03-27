@@ -2,9 +2,6 @@
     'use strict';
 
     function Menu() {
-        this.world = null;
-        this.titleTxt = null;
-        this.startTxt = null;
         this.score = 0;
     }
 
@@ -15,16 +12,11 @@
             var x = this.game.width * 0.5;
             var y = this.game.height * 0.5;
 
-            this.world.create(0, 0, 'background');
-
-            this.titleTxt = this.add.bitmapText(x, y - 400, 'gamefont', 'FLAPPY BIRD');
-            this.titleTxt.scale.setTo(2, 2);
-            this.titleTxt.align = 'center';
-            this.titleTxt.x = x - this.titleTxt.textWidth;
-
-            this.startTxt = this.add.bitmapText(x, y - 320, 'gamefont', 'HANDEN OMHOOG OM TE STARTEN');
-            this.startTxt.align = 'center';
-            this.startTxt.x = x - this.startTxt.textWidth * 0.5;
+            this.add.sprite(0, 0, 'background');
+            
+            this.add.text(x, 100, 'FLAPPY BIRD', { font: '128px Arial', fill: '#DDD894', align: 'center' }).anchor.set(0.5);
+            
+            this.add.text(x, 190, 'HANDEN OMHOOG OM TE STARTEN', { font: '46px Arial', fill: '#DDD894', align: 'center' }).anchor.set(0.5);
 
             var shape = this.add.graphics(x - 125, y - 200);
             shape.lineStyle(5, 0xFFFFFF, 1);
@@ -33,6 +25,8 @@
           
             this.add.sprite(this.game.width * 0.25, y, 'bird0').anchor.set(0.5);
             this.add.sprite(this.game.width * 0.75, y, 'bird1').anchor.set(0.5);
+            
+            this.add.sprite(this.game.width * 0.5, this.game.height, 'start').anchor.setTo(0.5,1);
           
             this.addWinner();
             this.addScore();
@@ -59,17 +53,15 @@
       
       addWinner: function () {
         
-        if(typeof this.game.winner !== 'undefined') {
-          var pos;
-          if(this.game.winner === 0) {
-            pos = this.game.width * 0.25;
-          } else {
-            pos = this.game.width * 0.75;
-          }
-          
-          var tmp = this.add.bitmapText(pos, this.game.height * 0.4, 'gamefont', 'WINNAAR');
-          tmp.align = 'center';
-          tmp.x = pos - tmp.textWidth * 0.5;
+        if(this.game.maxPlayers > 1 && typeof this.game.winner !== 'undefined') {
+              var pos;
+              if(this.game.winner === 0) {
+                pos = this.game.width * 0.25;
+              } else {
+                pos = this.game.width * 0.75;
+              }
+            
+            this.add.text(pos, 450, 'WINNAAR', { font: '46px Arial', fill: '#DDD894', align: 'center' }).anchor.set(0.5);
           
         }
       },
