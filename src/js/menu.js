@@ -30,6 +30,13 @@
           
             this.addWinner();
             this.addScore();
+            
+            // Dont update for 3 seconds
+            this.game.paused = true;
+            var _this = this;
+            setTimeout(function() {
+                _this.game.paused = false;
+            }, 3000);
         },
 		
 		update: function () {

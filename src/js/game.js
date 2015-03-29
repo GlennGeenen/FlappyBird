@@ -240,26 +240,31 @@
           if(_.every(this.players, function(player) { return player.deaths > 0; } )) {
             
             this.game.winner = player.index;
-            
-            this.game.state.states['menu'].score = this.score;
-            this.game.state.start('menu');
+            this.onGameOver();
             return;
           }
           
           setTimeout(resetBird, 500);
         },
+        
+        onGameOver: function () {
+            this.game.state.states['menu'].score = this.score;
+            this.game.state.start('menu');
+        },
 
         checkFlapping: function ()
         {
           if(!this.game.bodies.length) {
-            console.log('no bodies');
-            return;
+              this.onGameOver();
+              return;
           }
           
           var trackingids = _.map(this.game.bodies, function(body){ return body.TrackingId; });
               
           var joints = null;
           var trackid = null;
+          var bodyAlive = false;
+            
           for(var i = 0; i < this.game.maxPlayers; ++i) {
             
             trackid = this.players[i].trackid;
@@ -274,6 +279,7 @@
               console.log('invalid ' + trackid);
               continue;
             }
+            bodyAlive = true;
             joints = joints.Joints;
 
             ++this.players[i].flaptry;
@@ -314,6 +320,11 @@
                 this.players[i].flaptry = 0;
             }
           }
+            
+            if(!bodyAlive) {
+                this.onGameOver();
+            }
+            
         }
  
     };
